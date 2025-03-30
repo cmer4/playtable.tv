@@ -42,6 +42,15 @@ export function TableView() {
           console.log("📤 [Table] sent:", confirm);
         }
       }
+
+      if (message.type === "hand-disconnected") {
+        setJoinedHands((prev) => prev.filter((id) => id !== message.senderId));
+      
+        if (DEBUG_MODE) {
+          console.log("👋 [Table] hand disconnected:", message.senderId);
+        }
+      }
+      
     },
   });
 
