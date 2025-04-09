@@ -31,7 +31,15 @@ export type Message =
       role: "user" | "assistant";
     }
   | {
-      type: "all";
+      type: "hydrate";
       messages: ChatMessage[];
+      gameState: any;
+    }
+  | {
+      type: "update-state";
+      state: any
+    }
+  | {
+      type: "reconnect-ping";
     }
   | DebugMessage; // 🔥 NEW: Include game/session messages
