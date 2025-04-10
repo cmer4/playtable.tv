@@ -2,10 +2,10 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { useParams } from "react-router";
 import { PartySocket } from "partysocket";
 import { DEBUG_MODE } from "../../shared/constants";
+import type { Message } from "../../shared/types"; // ✅ Type import
 
 export function HandView() {
   const { sessionId } = useParams();
-
   const socketRef = useRef<PartySocket | null>(null);
 
   // 🔐 Unique per-tab hand ID
@@ -20,6 +20,9 @@ export function HandView() {
 
   const [connected, setConnected] = useState(false);
 
+  // ✅ Track the personalized state for this hand
+  const [handState, setHandState] = useState<any>({});
+
   useEffect(() => {
     let active = true;
 
@@ -27,7 +30,6 @@ export function HandView() {
       if (!sessionId) return;
 
       const socket = new PartySocket({
-        // 🧠 PartyKit host will be correct in prod, change in dev if needed
         host: window.location.host,
         room: sessionId,
         party: "chat",
@@ -49,10 +51,11 @@ export function HandView() {
       };
 
       socket.onmessage = (event) => {
-        const message = JSON.parse(event.data);
+        const message: Message = JSON.parse(event.data);
         if (DEBUG_MODE) {
           console.log("📥 [Hand] received:", message);
         }
+
         // 🔁 Respond to reconnect ping from table
         if (message.type === "reconnect-ping") {
           const rejoinMsg = {
@@ -61,9 +64,16 @@ export function HandView() {
             senderId,
           };
           socket.send(JSON.stringify(rejoinMsg));
-
           if (DEBUG_MODE) {
             console.log("🔁 [Hand] responded to reconnect-ping");
+          }
+        }
+
+        // ✅ NEW: personalized state received
+        if (message.type === "your-state" && message.handId === senderId) {
+          setHandState(message.state ?? {});
+          if (DEBUG_MODE) {
+            console.log("🎯 [Hand] received personalized state:", message.state);
           }
         }
       };
@@ -96,7 +106,10 @@ export function HandView() {
       <p>Status: {connected ? "🟢 Connected" : "🔴 Disconnected (reconnecting…)"}</p>
 
       <div style={{ marginTop: "2rem" }}>
-        <p>[Player controls will go here]</p>
+        <h3>Your Hand State:</h3>
+        <pre style={{ background: "#f0f0f0", padding: "1rem", borderRadius: "8px" }}>
+          {JSON.stringify(handState, null, 2)}
+        </pre>
       </div>
     </div>
   );

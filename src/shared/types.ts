@@ -1,6 +1,15 @@
 // shared/shared.ts
 
-// Core chat structure (unchanged)
+// ✅ Game-agnostic full game session state (shared between table + server)
+export type GameSessionState = {
+  serverState: any[]; // visible to the table and all hands if needed
+  handsState: {
+    handId: string;
+    state: any;
+  }[];
+};
+
+// 💬 Chat message structure (unchanged)
 export type ChatMessage = {
   id: string;
   content: string;
@@ -8,14 +17,15 @@ export type ChatMessage = {
   role: "user" | "assistant";
 };
 
-// 🔥 NEW: Game/debug messages for joining/disconnecting/etc.
+// 🔥 Game/session debug messages (non-gameplay-specific)
 export type DebugMessage =
   | { type: "hand-joined"; sessionId: string; senderId: string }
   | { type: "table-confirm"; sessionId: string; senderId: string; message: string }
   | { type: "hand-disconnected"; senderId: string };
 
-// ✅ Combined union for all message types
+// ✅ Full message union
 export type Message =
+  // 🧠 Chat events
   | {
       type: "add";
       id: string;
@@ -30,16 +40,29 @@ export type Message =
       user: string;
       role: "user" | "assistant";
     }
+
+  // 🔁 Session hydration and state sync
   | {
       type: "hydrate";
       messages: ChatMessage[];
-      gameState: any;
+      gameState: GameSessionState;
     }
   | {
       type: "update-state";
-      state: any
+      state: GameSessionState;
     }
+
+  // 🎯 Personalized payload for individual hands
+  | {
+      type: "your-state";
+      handId: string;
+      state: any;
+    }
+
+  // 🔄 Ping used after reconnect (from table)
   | {
       type: "reconnect-ping";
     }
-  | DebugMessage; // 🔥 NEW: Include game/session messages
+
+  // 🛠 Session lifecycle events
+  | DebugMessage;

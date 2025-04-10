@@ -5,7 +5,7 @@ import {
   routePartykitRequest,
 } from "partyserver";
 
-import type { ChatMessage, Message } from "../shared/types";
+import type { ChatMessage, GameSessionState, Message } from "../shared/types";
 
 const DEBUG_MODE = true;
 
@@ -17,8 +17,11 @@ export class Chat extends Server<Env> {
   // 🔥 Track senderId per connection (connection.id → senderId)
   connectedPlayers = new Map<string, string>();
 
-  // 🆕 Track game state in memory (also stored persistently via ctx.storage)
-  gameState: any = null;
+  // ✅ Game state now has structure: { serverState, handsState }
+  gameState: GameSessionState = {
+    serverState: [],
+    handsState: [],
+  };
 
   broadcastMessage(message: Message, exclude?: string[]) {
     this.broadcast(JSON.stringify(message), exclude);
@@ -36,16 +39,16 @@ export class Chat extends Server<Env> {
     // 💾 Load game state from PartyKit key-value storage
     const storedState = await this.ctx.storage.get("gameState");
     if (storedState) {
-      this.gameState = storedState;
+      this.gameState = storedState as GameSessionState;
     }
   }
 
   async onConnect(connection: Connection) {
-    // 🧠 Send stored messages and game state to reconnecting clients
+    // 🧠 Send stored messages and full game state (only meaningful to table)
     const fullHydration: Message = {
       type: "hydrate",
       messages: this.messages,
-      gameState: this.gameState, // 🆕 Send game state if any
+      gameState: this.gameState,
     };
     connection.send(JSON.stringify(fullHydration));
   }
@@ -70,11 +73,36 @@ export class Chat extends Server<Env> {
   async onMessage(connection: Connection, message: WSMessage) {
     const parsed = JSON.parse(message as string) as Message;
 
+    // 🔐 Track sender ID
     if (parsed.type === "hand-joined" && parsed.senderId) {
       this.connectedPlayers.set(connection.id, parsed.senderId);
+
+      // 🧠 Ensure that hand has an entry in gameState
+      const existing = this.gameState.handsState.find(
+        (h) => h.handId === parsed.senderId
+      );
+      if (!existing) {
+        this.gameState.handsState.push({
+          handId: parsed.senderId,
+          state: {}, // default empty state
+        });
+        await this.ctx.storage.put("gameState", this.gameState);
+      }
+
+      // 🎯 Send just that hand’s state back
+      const handState = this.gameState.handsState.find(
+        (h) => h.handId === parsed.senderId
+      );
+      connection.send(
+        JSON.stringify({
+          type: "your-state",
+          handId: parsed.senderId,
+          state: handState?.state ?? {},
+        })
+      );
     }
 
-    // 🆕 Handle incoming game state update from table or host
+    // 🧠 Game state update from table or controller
     if (parsed.type === "update-state" && parsed.state) {
       this.gameState = parsed.state;
       await this.ctx.storage.put("gameState", this.gameState);
@@ -82,11 +110,27 @@ export class Chat extends Server<Env> {
       if (DEBUG_MODE) {
         console.log("💾 [Server] saved new game state");
       }
+
+      // 🖥 Table gets full gameState
+      const tableUpdate: Message = {
+        type: "update-state",
+        state: this.gameState,
+      };
+      this.broadcastMessage(tableUpdate);
+
+      // ✉️ Each hand gets only its slice
+      this.gameState.handsState.forEach((hand) => {
+        const msg: Message = {
+          type: "your-state",
+          handId: hand.handId,
+          state: hand.state,
+        };
+        // Note: this sends to all hands — optionally you could track and only send to matching connection IDs
+        this.broadcastMessage(msg);
+      });
     }
 
-    // 🔁 Broadcast to all other clients
-    this.broadcast(message, [connection.id]);
-
+    // 📦 Game action (add/update messages)
     if (parsed.type === "add" || parsed.type === "update") {
       this.saveMessage({
         id: parsed.id,
@@ -95,6 +139,9 @@ export class Chat extends Server<Env> {
         role: parsed.role,
       });
     }
+
+    // 🔁 Let other clients react to generic messages
+    this.broadcast(message, [connection.id]);
   }
 
   onClose(connection: Connection) {
@@ -110,7 +157,7 @@ export class Chat extends Server<Env> {
   }
 }
 
-// ✅ Required to hook up HTTP requests (keep this!)
+// ✅ Required to hook up HTTP requests
 export default {
   async fetch(request, env) {
     return (
