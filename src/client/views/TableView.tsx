@@ -172,18 +172,21 @@ export function TableView() {
           </pre>
         </div>
       )}
-      <svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="xMidYMid" style={{ position: 'absolute', top: 0, left: 0 }}>
+      <svg viewBox="0 0 1920 1080" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="xMidYMid" style={{ position: 'absolute', top: 0, left: 0, backgroundColor: "000" }}>
+        
         <defs>
           <radialGradient id="feltGradient" cx="50%" cy="50%" r="70%" fx="50%" fy="50%">
-            <stop offset="0%" stopColor="#0f7c30" />
-            <stop offset="80%" stopColor="#0a5d24" />
-            <stop offset="100%" stopColor="#084d1e" />
+            <stop offset="0%" stop-color="#0f7c30" />
+            <stop offset="80%" stop-color="#0a5d24" />
+            <stop offset="100%" stop-color="#084d1e" />
           </radialGradient>
+          
           <pattern id="feltTexture" width="10" height="10" patternUnits="userSpaceOnUse" patternTransform="scale(2)">
             <rect width="10" height="10" fill="none"/>
-            <path d="M0 0 L10 10 M10 0 L0 10" stroke="#0a5d24" strokeWidth="0.2" opacity="0.1" />
-            <path d="M5 0 L5 10 M0 5 L10 5" stroke="#0f7c30" strokeWidth="0.1" opacity="0.1" />
+            <path d="M0 0 L10 10 M10 0 L0 10" stroke="#0a5d24" stroke-width="0.2" opacity="0.1" />
+            <path d="M5 0 L5 10 M0 5 L10 5" stroke="#0f7c30" stroke-width="0.1" opacity="0.1" />
           </pattern>
+          
           <filter id="feltLighting" x="-10%" y="-10%" width="120%" height="120%">
             <feGaussianBlur in="SourceAlpha" stdDeviation="2" result="blur" />
             <feDiffuseLighting in="blur" surfaceScale="2" diffuseConstant="1" result="diffLight">
@@ -192,85 +195,55 @@ export function TableView() {
             <feComposite in="diffLight" in2="SourceGraphic" operator="arithmetic" k1="1" k2="0" k3="0" k4="0" result="lightResult" />
             <feBlend in="SourceGraphic" in2="lightResult" mode="multiply" />
           </filter>
+          
           <filter id="feltNoise">
             <feTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch" result="noise" />
             <feColorMatrix type="saturate" values="0" in="noise" result="desaturatedNoise" />
             <feComposite operator="arithmetic" k1="0" k2="0.03" k3="0" k4="0" in="desaturatedNoise" in2="SourceGraphic" />
           </filter>
         </defs>
-        <rect width="1920" height="1080" fill="#f5f5f5"/>
-        <g transform="translate(960, 540)">
+        
+        <ellipse cx="950" cy="540" rx="950" ry="530" fill="#8B4513" />
+        <ellipse cx="950" cy="540" rx="935" ry="515" fill="url(#feltGradient)" />
+        <ellipse cx="950" cy="540" rx="935" ry="515" fill="url(#feltTexture)" />
+        <ellipse cx="950" cy="540" rx="935" ry="515" filter="url(#feltLighting)" fill="none" opacity="0.7" />
+        <ellipse cx="950" cy="540" rx="935" ry="515" filter="url(#feltNoise)" fill="none" />
+        <ellipse cx="950" cy="540" rx="935" ry="515" fill="none" stroke="#084d1e" stroke-width="3" opacity="0.3" />
+        <ellipse cx="950" cy="540" rx="935" ry="515" fill="none" stroke="#5D4037" stroke-width="2" />
 
-        <ellipse
-          cx="0"
-          cy="0"
-          rx="720"
-          ry="480"
-          fill="url(#feltGradient)"
-          filter="url(#feltLighting)"
-          stroke="#2c3e50"
-          strokeWidth="5"
-        />
-        <ellipse
-          cx="0"
-          cy="0"
-          rx="720"
-          ry="480"
-          fill="url(#feltTexture)"
-          opacity="0.6"
-        />
-        <ellipse
-          cx="0"
-          cy="0"
-          rx="720"
-          ry="480"
-          filter="url(#feltNoise)"
-          fill="none"
-        />
-        <ellipse
-          cx="0"
-          cy="0"
-          rx="720"
-          ry="480"
-          fill="none"
-          stroke="#084d1e"
-          strokeWidth="3"
-          opacity="0.3"
-        />
+        <circle cx="960" cy="40" r="60" fill="#8e44ad" stroke="#333" strokeWidth="2"/>
+        <text x="960" y="50" fontSize="32" textAnchor="middle" fill="white">D</text>
 
-          <circle cx="0" cy="-480" r="60" fill="#8e44ad" stroke="#333" strokeWidth="2"/>
-          <text x="0" y="-470" fontSize="32" textAnchor="middle" fill="white">D</text>
+        <circle cx="1583.5" cy="780" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
+        <text x="1583.5" y="790" fontSize="32" textAnchor="middle" fill="white">1</text>
 
-          <circle cx="623.5" cy="240" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
-          <text x="623.5" y="250" fontSize="32" textAnchor="middle" fill="white">1</text>
+        <circle cx="1320" cy="955.7" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
+        <text x="1320" y="965" fontSize="32" textAnchor="middle" fill="white">2</text>
 
-          <circle cx="360" cy="415.7" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
-          <text x="360" y="425" fontSize="32" textAnchor="middle" fill="white">2</text>
+        <circle cx="600" cy="955.7" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
+        <text x="600" y="965" fontSize="32" textAnchor="middle" fill="white">3</text>
 
-          <circle cx="-360" cy="415.7" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
-          <text x="-360" y="425" fontSize="32" textAnchor="middle" fill="white">3</text>
+        <circle cx="336.5" cy="780" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
+        <text x="336.5" y="790" fontSize="32" textAnchor="middle" fill="white">4</text>
 
-          <circle cx="-623.5" cy="240" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
-          <text x="-623.5" y="250" fontSize="32" textAnchor="middle" fill="white">4</text>
+        <circle cx="40" cy="540" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
+        <text x="40" y="550" fontSize="32" textAnchor="middle" fill="white">5</text>
 
-          <circle cx="-720" cy="0" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
-          <text x="-720" y="10" fontSize="32" textAnchor="middle" fill="white">5</text>
+        <circle cx="336.5" cy="300" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
+        <text x="336.5" y="310" fontSize="32" textAnchor="middle" fill="white">6</text>
 
-          <circle cx="-623.5" cy="-240" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
-          <text x="-623.5" y="-230" fontSize="32" textAnchor="middle" fill="white">6</text>
+        <circle cx="600" cy="124.3" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
+        <text x="600" y="135" fontSize="32" textAnchor="middle" fill="white">7</text>
 
-          <circle cx="-360" cy="-415.7" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
-          <text x="-360" y="-405" fontSize="32" textAnchor="middle" fill="white">7</text>
+        <circle cx="1320" cy="124.3" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
+        <text x="1320" y="135" fontSize="32" textAnchor="middle" fill="white">8</text>
 
-          <circle cx="360" cy="-415.7" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
-          <text x="360" y="-405" fontSize="32" textAnchor="middle" fill="white">8</text>
+        <circle cx="1583.5" cy="300" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
+        <text x="1583.5" y="310" fontSize="32" textAnchor="middle" fill="white">9</text>
 
-          <circle cx="623.5" cy="-240" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
-          <text x="623.5" y="-230" fontSize="32" textAnchor="middle" fill="white">9</text>
+        <circle cx="1800" cy="540" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
+        <text x="1850" y="550" fontSize="32" textAnchor="middle" fill="white">10</text>
 
-          <circle cx="720" cy="0" r="60" fill="#3498db" stroke="#333" strokeWidth="2"/>
-          <text x="720" y="10" fontSize="32" textAnchor="middle" fill="white">10</text>
-        </g>
       </svg>
     </div>
   );
