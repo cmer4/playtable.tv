@@ -14,9 +14,13 @@
     "preview_image_url": "https://imagedelivery.net/wSMYJvS3Xw-n339CbDyDIA/e18406a7-a5d8-4c3d-2b9e-f59e6beb9200/public"
   },
   "dependencies": {
+    "@lowlighter/qrcode": "^2.0.0",
     "nanoid": "5.0.8",
     "partyserver": "0.0.57",
     "partysocket": "1.0.2",
+    "qr.js": "^0.0.0",
+    "qrcode": "^1.5.4",
+    "qrcode-generator-ts": "^0.0.4",
     "qrcode.react": "^4.2.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
@@ -24,6 +28,7 @@
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250204.0",
+    "@types/qrcode": "^1.5.5",
     "@types/react": "18.3.12",
     "@types/react-dom": "18.3.1",
     "esbuild": "0.24.0",
